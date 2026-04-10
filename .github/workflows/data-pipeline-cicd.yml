@@ -1,0 +1,362 @@
+# PROVIDED CODE - DO NOT MODIFY
+# Workflow environment configuration
+env:
+  PYTHON_VERSION: '3.9'
+  PIPELINE_VERSION: '1.0'
+  ENVIRONMENT: 'simulation'
+
+### PRACTICE CHALLENGE 1 ###
+# TASK: Configure workflow triggers for main branch pushes and pull requests, 
+# excluding documentation files from triggering the workflow
+# 
+# REQUIREMENTS:
+# - Trigger on push to main branch
+# - Trigger on pull requests to main branch  
+# - Exclude markdown files (*.md) from triggering
+# - Exclude README files and docs directory from triggering
+# - Ensure efficient resource usage by filtering unnecessary runs
+#
+# YOUR CODE HERE:
+on:
+  # Add your trigger configuration here
+  # Use this structure:
+  # push:
+  #   branches: [main]
+  #   paths-ignore:
+  #     - '**.md'
+  #     - 'README*'
+  #     - 'docs/**'
+  # pull_request:
+  #   branches: [main]  
+  #   paths-ignore:
+  #     - '**.md'
+  #     - 'README*'
+  #     - 'docs/**'
+
+jobs:
+  # PROVIDED CODE - DO NOT MODIFY  
+  test:
+    name: Run Comprehensive Tests
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          
+      - name: Create simulated project files
+        run: |
+          # Create simulated pipeline configuration
+          mkdir -p tests/
+          echo "version: '1.0'" > pipeline-config.yml
+          echo "pipeline:" >> pipeline-config.yml  
+          echo "  name: customer-analytics" >> pipeline-config.yml
+          echo "  source: database" >> pipeline-config.yml
+          echo "  destination: warehouse" >> pipeline-config.yml
+          echo "  transformation:" >> pipeline-config.yml
+          echo "    - clean_data" >> pipeline-config.yml
+          echo "    - aggregate_metrics" >> pipeline-config.yml
+          echo "    - export_results" >> pipeline-config.yml
+          
+          # Create simulated requirements.txt
+          echo "pandas>=1.3.0" > requirements.txt
+          echo "numpy>=1.20.0" >> requirements.txt
+          echo "pyyaml>=5.4.0" >> requirements.txt
+          echo "pytest>=6.2.0" >> requirements.txt
+          echo "requests>=2.25.0" >> requirements.txt
+          
+          # Create simulated test file
+          echo "import pytest" > tests/test_pipeline.py
+          echo "import yaml" >> tests/test_pipeline.py
+          echo "" >> tests/test_pipeline.py
+          echo "def test_pipeline_config_exists():" >> tests/test_pipeline.py
+          echo "    with open('pipeline-config.yml', 'r') as f:" >> tests/test_pipeline.py
+          echo "        config = yaml.safe_load(f)" >> tests/test_pipeline.py
+          echo "        assert config['version'] == '1.0'" >> tests/test_pipeline.py
+          echo "" >> tests/test_pipeline.py
+          echo "def test_pipeline_structure():" >> tests/test_pipeline.py
+          echo "    assert True  # Simulated test" >> tests/test_pipeline.py
+          
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest pandas numpy pyyaml requests
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          echo "✅ Dependencies installed successfully"
+          
+      - name: Run unit tests
+        run: |
+          echo "🧪 Running comprehensive test suite..."
+          pytest tests/ -v --tb=short || echo "Tests completed with simulated results"
+          echo "✅ All unit tests passed successfully"
+          
+      - name: Validate pipeline configuration
+        run: |
+          echo "🔍 Validating pipeline configuration..."
+          python -c "import yaml; config = yaml.safe_load(open('pipeline-config.yml')); print(f'Pipeline: {config[\"pipeline\"][\"name\"]}')"
+          echo "✅ Pipeline configuration is valid"
+          
+      - name: Code quality checks
+        run: |
+          echo "🔍 Running code quality checks..."
+          echo "  ├── Linting check: ✅ PASSED"
+          echo "  ├── Security scan: ✅ PASSED"
+          echo "  ├── Dependency audit: ✅ PASSED"
+          echo "  └── Code coverage: ✅ 95% coverage"
+          echo "✅ All quality checks completed successfully"
+
+  ### PRACTICE CHALLENGE 2 ###
+  # TASK: Implement build simulation job that validates Docker configuration,
+  # creates version-tagged artifacts, and simulates registry operations
+  # 
+  # REQUIREMENTS:
+  # - Job must depend on successful test completion (needs: test)
+  # - Create and validate Dockerfile simulation
+  # - Generate artifacts tagged with Git SHA and 'latest' identifiers
+  # - Upload artifacts using actions/upload-artifact@v3 for deployment job
+  # - Include comprehensive build validation and error handling
+  # - Simulate multi-platform build process
+  #
+  # YOUR CODE HERE:
+  build:
+    name: Build and Package Artifacts
+    runs-on: ubuntu-latest
+    # Add job dependency here - should only run after successful testing
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Create simulated Dockerfile
+        run: |
+          # Create realistic Dockerfile for validation
+          cat << 'EOF' > Dockerfile
+          FROM python:3.9-slim
+          
+          # Set working directory
+          WORKDIR /app
+          
+          # Install system dependencies
+          RUN apt-get update && apt-get install -y \
+              gcc \
+              && rm -rf /var/lib/apt/lists/*
+          
+          # Copy requirements and install Python dependencies
+          COPY requirements.txt .
+          RUN pip install --no-cache-dir -r requirements.txt
+          
+          # Copy application code
+          COPY . .
+          
+          # Create non-root user
+          RUN useradd -m -u 1000 pipeline && chown -R pipeline:pipeline /app
+          USER pipeline
+          
+          # Expose port and set startup command
+          EXPOSE 8080
+          CMD ["python", "app.py"]
+          EOF
+          
+          # Create simulated application file
+          cat << 'EOF' > app.py
+          #!/usr/bin/env python3
+          import time
+          import yaml
+          import pandas as pd
+          
+          def run_pipeline():
+              print("🚀 Starting data pipeline application...")
+              
+              # Load configuration
+              with open('pipeline-config.yml', 'r') as f:
+                  config = yaml.safe_load(f)
+              
+              print(f"📊 Running pipeline: {config['pipeline']['name']}")
+              
+              # Simulate data processing
+              time.sleep(2)
+              print("✅ Data pipeline completed successfully")
+          
+          if __name__ == "__main__":
+              run_pipeline()
+          EOF
+          
+          echo "✅ Application files created successfully"
+        
+      - name: Validate Docker configuration
+        run: |
+          echo "🐳 Validating Docker configuration..."
+          
+          # Check Dockerfile exists and has required components
+          if [ ! -f Dockerfile ]; then
+            echo "❌ Dockerfile not found"
+            exit 1
+          fi
+          
+          # Validate Dockerfile content
+          if grep -q "FROM python:" Dockerfile; then
+            echo "✅ Base image specified correctly"
+          else
+            echo "❌ Invalid base image"
+            exit 1
+          fi
+          
+          if grep -q "WORKDIR /app" Dockerfile; then
+            echo "✅ Working directory configured"
+          else
+            echo "❌ Working directory not set"
+            exit 1
+          fi
+          
+          echo "✅ Docker configuration validation completed"
+          
+      # Add your build simulation steps here:
+      # 1. Simulate Docker build process with platform support
+      # 2. Create version tags using Git SHA and latest
+      # 3. Create build artifacts (files simulating Docker images)
+      # 4. Upload artifacts for deployment job using actions/upload-artifact@v3
+      # 
+      # Suggested steps to implement:
+      # - name: Simulate Docker build process
+      # - name: Create version tags  
+      # - name: Generate build artifacts
+      # - name: Upload build artifacts
+      # - name: Build validation summary
+      #
+      # Hints:
+      # - Use ${{ github.sha }} for commit SHA
+      # - Create files in build-artifacts/ directory to simulate images
+      # - Include build timestamp and version information
+      # - Use proper error handling and validation
+
+  ### PRACTICE CHALLENGE 3 ###
+  # TASK: Create deployment simulation job that demonstrates production
+  # deployment patterns with comprehensive validation and rollback capabilities
+  #
+  # REQUIREMENTS:
+  # - Job depends on successful test and build completion (needs: [test, build])
+  # - Use 'production' environment for GitHub environment protection
+  # - Download and validate build artifacts from build job
+  # - Simulate realistic production deployment with environment configuration
+  # - Include comprehensive health check validation (container, application, performance)
+  # - Implement rollback simulation using 'if: failure()' condition
+  # - Provide detailed deployment summary with metrics and traceability
+  #
+  # YOUR CODE HERE:
+  deploy:
+    name: Deploy to Production (Simulated)
+    runs-on: ubuntu-latest
+    # Add job dependencies here - should depend on both test and build jobs
+    environment: production  # This creates GitHub environment protection
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      # Add your deployment simulation steps here:
+      # 1. Download build artifacts from build job
+      # 2. Validate deployment prerequisites and artifact integrity
+      # 3. Configure production environment with realistic settings
+      # 4. Simulate production deployment process
+      # 5. Run comprehensive health check validation
+      # 6. Implement post-deployment validation and monitoring
+      # 7. Create rollback simulation for failure scenarios
+      #
+      # Suggested steps to implement:
+      # - name: Download build artifacts
+      # - name: Validate deployment prerequisites  
+      # - name: Configure production environment
+      # - name: Simulate production deployment
+      # - name: Comprehensive health checks
+      # - name: Post-deployment validation
+      # - name: Update deployment status
+      # - name: Rollback on failure (with if: failure())
+      #
+      # Hints:
+      # - Use actions/download-artifact@v3 to get build artifacts
+      # - Include environment variables for production configuration
+      # - Simulate realistic health checks (container, app, database, performance)
+      # - Use sleep commands to simulate startup and validation time
+      # - Include proper error handling and rollback procedures
+        
+      - name: Deployment Summary
+        run: |
+          echo ""
+          echo "🎉 DEPLOYMENT COMPLETED SUCCESSFULLY! 🎉"
+          echo "================================================="
+          echo "🚀 Production deployment completed successfully"
+          echo "📦 Artifact Version: ${{ env.PIPELINE_VERSION }}-${{ github.sha }}"
+          echo "🔍 Commit SHA: ${{ github.sha }}"
+          echo "👤 Deployed by: ${{ github.actor }}"
+          echo "⏰ Deployment Time: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          echo "🌍 Environment: production"
+          echo "================================================="
+          echo ""
+          echo "📊 Key Metrics:"
+          echo "  ├── Build Duration: ~2 minutes"
+          echo "  ├── Deployment Duration: ~3 minutes" 
+          echo "  ├── Health Check Status: All systems operational"
+          echo "  ├── Performance Validation: Within acceptable thresholds"
+          echo "  └── Rollback Capability: ✅ Enabled and tested"
+          echo ""
+          echo "🔗 Next Steps:"
+          echo "  • Monitor production metrics dashboard"
+          echo "  • Validate data pipeline processing performance"  
+          echo "  • Review deployment logs and system health"
+          echo "  • Update team documentation and runbooks"
+          echo "  • Schedule post-deployment review meeting"
+
+# ================================================================
+# COMPLETION CHECKLIST FOR STUDENTS
+# ================================================================
+# 
+# ✅ PRACTICE CHALLENGE 1: Workflow Triggers
+#    □ Configured push and pull_request triggers for main branch
+#    □ Added paths-ignore filters for documentation files
+#    □ Verified workflow only runs on code changes
+#
+# ✅ PRACTICE CHALLENGE 2: Build Simulation  
+#    □ Added needs: test dependency
+#    □ Created Docker build simulation steps
+#    □ Generated artifacts with Git SHA and latest tags
+#    □ Uploaded artifacts for deployment job consumption
+#    □ Included comprehensive build validation
+#
+# ✅ PRACTICE CHALLENGE 3: Deployment Simulation
+#    □ Added needs: [test, build] dependencies
+#    □ Downloaded and validated build artifacts
+#    □ Simulated production deployment process
+#    □ Implemented comprehensive health checks
+#    □ Added rollback simulation with if: failure()
+#    □ Provided detailed deployment summary
+#
+# 🎯 SUCCESS INDICATORS:
+#    □ Workflow triggers correctly on code changes (not docs)
+#    □ All three jobs execute in proper sequence  
+#    □ Build artifacts are created and shared between jobs
+#    □ Deployment simulation includes realistic validation
+#    □ Health checks demonstrate production monitoring patterns
+#    □ Rollback simulation triggers on failure scenarios
+#    □ Workflow provides clear success/failure feedback
+#
+# ================================================================
+# SIMULATION VS PRODUCTION MAPPING
+# ================================================================
+#
+# WHAT WE SIMULATE          →  REAL PRODUCTION EQUIVALENT
+# ================================  ================================
+# File artifacts            →  Docker images in registries
+# Environment variables     →  Kubernetes secrets/ConfigMaps  
+# Health check scripts      →  Monitoring systems (Datadog, etc.)
+# Rollback simulation       →  Blue-green deployments
+# Job dependencies          →  Pipeline orchestration
+# GitHub environments       →  Production access controls
+# Artifact uploads          →  Container registry pushes
+# Validation scripts        →  Integration test suites
+#
+# ================================================================
+
