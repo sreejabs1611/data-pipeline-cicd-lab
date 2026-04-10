@@ -17,21 +17,21 @@ env:
 # - Ensure efficient resource usage by filtering unnecessary runs
 #
 # YOUR CODE HERE:
-on: check_run
+on:
   # Add your trigger configuration here
   # Use this structure:
-  # push:
-  #   branches: [main]
-  #   paths-ignore:
-  #     - '**.md'
-  #     - 'README*'
-  #     - 'docs/**'
-  # pull_request:
-  #   branches: [main]  
-  #   paths-ignore:
-  #     - '**.md'
-  #     - 'README*'
-  #     - 'docs/**'
+   push:
+     branches: [main]
+     paths-ignore:
+       - '**.md'
+       - 'README*'
+       - 'docs/**.'
+   pull_request:
+     branches: [main]  
+     paths-ignore:
+       - '**.md'
+       - 'README*'
+       - 'docs/**.'
 
 jobs:
   # PROVIDED CODE - DO NOT MODIFY  
@@ -146,7 +146,7 @@ jobs:
               && rm -rf /var/lib/apt/lists/*
           
           # Copy requirements and install Python dependencies
-          COPY requirements.txt .
+          COPY requirements.txt 
           RUN pip install --no-cache-dir -r requirements.txt
           
           # Copy application code
