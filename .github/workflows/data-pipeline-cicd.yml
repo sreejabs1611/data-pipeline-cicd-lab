@@ -17,7 +17,7 @@ env:
 # - Ensure efficient resource usage by filtering unnecessary runs
 #
 # YOUR CODE HERE:
-on:
+on: check_run
   # Add your trigger configuration here
   # Use this structure:
   # push:
